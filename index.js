@@ -7,7 +7,7 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
-	console.log('Ready!');
+	console.log('Bot çevrimiçi!');
 });
 
 client.on('interactionCreate', async interaction => {
@@ -21,6 +21,8 @@ client.on('interactionCreate', async interaction => {
 		await interaction.reply('Zort!');
 	} else if (commandName === '31') {
 		await interaction.reply('sj');
+	} else if (commandName === 'hypnamed') {
+		await interaction.reply('My GitHub Profile: https://github.com/hypnamed \nMy Twitch Channel: https://twitch.tv/hypnamed \nMy YouTube Channel: https://youtube.com/c/Hypnamed \nMy Website: https://erendemirtas.online');
 	}
 });
 
