@@ -1,33 +1,34 @@
-// Require the necessary discord.js classes
-const { Client, Intents } = require("discord.js");
-const { token } = require("./config.json");
+const fs = require('node:fs');
+const { Client, Collection, Intents } = require('discord.js');
+const { token } = require('./config.json');
 
-// Create a new client instance
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-// When the client is ready, run this code (only once)
-client.once("ready", () => {
-  console.log("Bot çevrimiçi!");
-  client.user.setActivity("One Piece", { type: "WATCHING" });
+client.commands = new Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	client.commands.set(command.data.name, command);
+}
+
+client.once('ready', () => {
+	console.log('Ready!');
 });
 
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isCommand()) return;
+client.on('interactionCreate', async interaction => {
+	if (!interaction.isCommand()) return;
 
-  const { commandName } = interaction;
+	const command = client.commands.get(interaction.commandName);
 
-  if (commandName === "selam") {
-    await interaction.reply("Aleyküm selam!");
-  } else if (commandName === "zart") {
-    await interaction.reply("Zort!");
-  } else if (commandName === "31") {
-    await interaction.reply("sj");
-  } else if (commandName === "hypnamed") {
-    await interaction.reply(
-      "My GitHub Profile: @Hypnamed \nMy Twitch Channel: twitch.tv/hypnamed \nMy YouTube Channel: Hypnamed \nMy Website: https://erendemirtas.online"
-    );
-  }
+	if (!command) return;
+
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'Komut gerçekleştirilmeye çalışılınırken bir hata ile karşılaşıldı.', ephemeral: true });
+	}
 });
 
-// Login to Discord with your client's token
 client.login(token);
